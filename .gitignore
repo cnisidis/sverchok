@@ -51,3 +51,4 @@ __MACOSX
 
 #Ignore sphinx build folder
 docs/_build
+*.swp
