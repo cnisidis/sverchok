@@ -109,17 +109,14 @@ class GenListRangeInt(SverchCustomTreeNode):
         self.inputs.new('StringsSocket', "Stop").prop_name = 'stop_'
 
         self.outputs.new('StringsSocket', "Range", "Range")
+        self.state = "ACTIVE"
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode", expand=True)
 
     func_dict = {'LAZYRANGE': intRange,
                  'COUNTRANGE': countRange}
-    
-    def update(self):
-        print("update called {0}".format(self.name))
-        if self.outputs:
-            self.state = "ACTIVE"
+
         
     def process(self):
         inputs = self.inputs

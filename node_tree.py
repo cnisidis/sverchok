@@ -191,6 +191,7 @@ class SverchCustomTree(NodeTree):
             return
             
         for node in self.nodes:
+            print(node.name,node.state)
             if node.state == "NOT_READY":
                 print("Giving up update, node {0} isn't ready".format(node.name))
                 return
@@ -205,8 +206,6 @@ class SverchCustomTree(NodeTree):
         if self.sv_animate:
             sverchok_update(tree=self)
 
-NOT_READY = 0
-READY = 1
 
 class SverchCustomTreeNode( Node):
     @classmethod
