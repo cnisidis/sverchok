@@ -244,7 +244,7 @@ class SverchokToolsMenu(bpy.types.Panel):
         #row.operator('wm.url_open', text='Bugtr').url = 'https://docs.google.com/forms/d/1L2BIpDhjMgQEbVAc7pEq93432Qanu8UPbINhzJ5SryI/viewform'
 
 
-class ToolsNode(bpy.types.Node, SverchCustomTreeNode):
+class ToolsNode(SverchCustomTreeNode):
     ''' Tools for different purposes '''
     bl_idname = 'ToolsNode'
     bl_label = 'Tools node'

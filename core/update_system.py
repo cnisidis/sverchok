@@ -327,15 +327,31 @@ def sverchok_update(start_node=None, tree=None, animation_mode=False):
     global partial_update_cache
 
     def do_update(node_list, nods):
+        process_list = []
+        ready = True
         for nod_name in node_list:
             if nod_name in nods:
-                nods[nod_name].update()
-
+                node = nods[nod_name]
+                node.update()
+                if node.state:
+                    print("Node {0} is ready".format(node.name))
+                else:
+                    print("Node {0} isn't ready".format(node.name))
+                ready *= node.state
+                process_list.append(node)
+        if ready:
+            for node in process_list:
+                print("processing {0}".format(node.name))
+                node.process()
+        else:
+            print("not ready", node_list)
+    """
     if data_structure.DEBUG_MODE:
         do_update = do_update_debug
     if data_structure.HEAT_MAP:
         do_update = do_update_heat_map
-
+    """
+    
     # try to update optimized animation trees, not ready
     if animation_mode:
         pass

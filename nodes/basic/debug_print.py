@@ -23,7 +23,7 @@ from node_tree import SverchCustomTreeNode
 from data_structure import multi_socket, SvGetSocketAnyType, updateNode
 
 
-class SvDebugPrintNode(bpy.types.Node, SverchCustomTreeNode):
+class SvDebugPrintNode(SverchCustomTreeNode):
     ''' SvDebugPrintNode '''
     bl_idname = 'SvDebugPrintNode'
     bl_label = 'Debug print'
@@ -54,8 +54,14 @@ class SvDebugPrintNode(bpy.types.Node, SverchCustomTreeNode):
             layout.prop(self, "print_socket", index=i, text=socket.name)
 
     def update(self):
+        print("update called {0}".format(self.name))
         multi_socket(self, min=1)
+        if len(self.inputs)>1 and not self.inputs[-1].links:
+            self.state=any(self.print_socket) and self.print_data
+        else:
+            self.state=0
         
+    def process(self):
         if not self.print_data:
             return
         
@@ -68,8 +74,6 @@ class SvDebugPrintNode(bpy.types.Node, SverchCustomTreeNode):
         else:
             self.use_custom_color = True
             self.color = (0.05,0.05,0.1)
-    def update_socket(self, context):
-        self.update()
 
 
 def register():

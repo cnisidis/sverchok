@@ -123,6 +123,7 @@ class SvGenFloatRange(bpy.types.Node, SverchCustomTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode", expand=True)
+        print("{0} introspect {1}".format(self.name,layout.introspect()))
 
     func_dict = {'FRANGE': frange,
                  'FRANGE_COUNT': frange_count,

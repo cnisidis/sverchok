@@ -22,7 +22,7 @@ from node_tree import SverchCustomTreeNode
 from data_structure import updateNode, SvSetSocketAnyType, SvGetSocketAnyType
 
 
-class IntegerNode(bpy.types.Node, SverchCustomTreeNode):
+class IntegerNode(SverchCustomTreeNode):
     ''' Integer '''
     bl_idname = 'IntegerNode'
     bl_label = 'Integer'
@@ -37,20 +37,13 @@ class IntegerNode(bpy.types.Node, SverchCustomTreeNode):
         self.outputs.new('StringsSocket', "Integer", "Integer")
 
     def update(self):
-        # inputs
-        if 'Integer' in self.inputs and self.inputs['Integer'].links:
-            tmp = SvGetSocketAnyType(self, self.inputs['Integer'])
-            Integer = tmp[0][0]
-        else:
-            Integer = self.int_
-
-        # outputs
-        if 'Integer' in self.outputs and self.outputs['Integer'].links:
-            SvSetSocketAnyType(self, 'Integer', [[Integer]])
-
-    def update_socket(self, context):
-        self.update()
-
+        print("update called {0}".format(self.name))
+        self.state = len(self.outputs)
+        
+    def process(self):
+        number = self.inputs[0].sv_get()[0][0]
+        self.outputs[0].sv_set([[number]])
+        
 
 def register():
     bpy.utils.register_class(IntegerNode)

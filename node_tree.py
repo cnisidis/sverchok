@@ -18,8 +18,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import StringProperty, BoolProperty, FloatVectorProperty
-from bpy.types import NodeTree, NodeSocket, NodeSocketStandard
+from bpy.props import StringProperty, BoolProperty, FloatVectorProperty, IntProperty
+from bpy.types import NodeTree, NodeSocket, NodeSocketStandard, Node
 from nodeitems_utils import NodeCategory, NodeItem
 
 import data_structure
@@ -200,12 +200,14 @@ class SverchCustomTree(NodeTree):
         if self.sv_animate:
             sverchok_update(tree=self)
 
+NOT_READY = 0
+READY = 1
 
-class SverchCustomTreeNode:
+class SverchCustomTreeNode( Node):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'SverchCustomTreeType'
-
+    state = IntProperty(default=0)
 
 class SverchNodeCategory(NodeCategory):
     @classmethod

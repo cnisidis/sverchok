@@ -55,12 +55,13 @@ def countRange(start=0, step=1, count=10):
     return list(range(start, stop, step))
 
 
-class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
+class GenListRangeInt(SverchCustomTreeNode):
     ''' Generator range list of ints '''
     bl_idname = 'GenListRangeIntNode'
     bl_label = 'List Range Int'
     bl_icon = 'OUTLINER_OB_EMPTY'
 
+    
     start_ = IntProperty(
         name='start', description='start',
         default=0,
@@ -113,13 +114,18 @@ class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
 
     func_dict = {'LAZYRANGE': intRange,
                  'COUNTRANGE': countRange}
-
+    
     def update(self):
+        print("update called {0}".format(self.name))
+        if self.outputs:
+            self.state = 1
+        
+    def process(self):
         inputs = self.inputs
         outputs = self.outputs
 
         # outputs, end early.
-        if 'Range' not in outputs or not outputs['Range'].links:
+        if not outputs['Range'].links:
             return
 
         param = [inputs[i].sv_get()[0] for i in range(3)]

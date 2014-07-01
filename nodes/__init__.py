@@ -1,4 +1,12 @@
-nodes_dict = {'analyzer': ['area',
+
+nodes_dict = {'basic': ['debug_print'],
+                    
+              'number': ['integer',
+                         'range_int']
+              }
+
+
+nodes_dict_old = {'analyzer': ['area',
                            'bbox',
                            'distance_pp',
                            'polygons_centers',
