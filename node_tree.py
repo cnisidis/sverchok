@@ -261,6 +261,10 @@ def make_categories():
             #NodeItem("GTextNode", label="GText"),
             #NodeItem("ToolsNode", label="Update Button"),
             NodeItem("SvDebugPrintNode", label="Debug print"),
+            NodeItem("SvGroupNode", label="Group"),
+            NodeItem("SvGroupInputsNode", label="Group In"),
+            NodeItem("SvGroupOutputsNode", label="Group Out"),
+
             ]),
         #SverchNodeCategory("SVERCHOK_L", "SVERCHOK list", items=[
             ## lists nodes
@@ -397,7 +401,6 @@ def register():
     bpy.utils.register_class(SvColors)
     bpy.utils.register_class(SverchCustomTree)
     bpy.utils.register_class(SverchGroupTree)
-    bpy.utils.register_class(SverchCustomTreeNode)
     bpy.utils.register_class(MatrixSocket)
     #bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(StringsSocket)
@@ -408,7 +411,6 @@ def unregister():
     bpy.utils.unregister_class(StringsSocket)
     #bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(MatrixSocket)
-    bpy.utils.unregister_class(SverchCustomTree)
     bpy.utils.unregister_class(SverchGroupTree)
     bpy.utils.unregister_class(SverchCustomTreeNode)
     bpy.utils.unregister_class(SvColors)

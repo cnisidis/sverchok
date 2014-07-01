@@ -342,6 +342,32 @@ def do_update_debug(node_list, nods):
                 timings.append((nod_name, delta))
 
 
+def do_update(node_list, nodes):
+    process_list = []
+    ready = True
+    for node_name in node_list:
+        if node_name in nodes:
+            node = nodes[node_name]
+            #node.update()
+            if node.state == "ACTIVE":
+                print("Node {0} is ready".format(node.name))
+                ready *=  True
+            elif node.state == "INACTIVE":
+                ready *= False
+                print("Node {0} inactive".format(node.name))
+            elif node.state == "NOT_READY":
+                print("Node {0} isn't ready, giving up".format(node.name))
+                return
+            process_list.append(node)
+        else:
+            print("Horrible fail")
+    if ready:
+        for node in process_list:
+            print("processing {0}".format(node.name))
+            node.process()
+    else:
+        print("not ready", node_list)
+
 def sverchok_update(start_node=None, tree=None, animation_mode=False):
     """
     Sverchok master update function.
@@ -351,29 +377,7 @@ def sverchok_update(start_node=None, tree=None, animation_mode=False):
     global partial_update_cache
     
     
-    def do_update(node_list, nods):
-        process_list = []
-        ready = True
-        for nod_name in node_list:
-            if nod_name in nods:
-                node = nods[nod_name]
-                #node.update()
-                if node.state == "ACTIVE":
-                    print("Node {0} is ready".format(node.name))
-                    ready *=  True
-                elif node.state == "INACTIVE":
-                    ready *= False
-                    print("Node {0} inactive".format(node.name))
-                elif node.state == "NOT_READY":
-                    print("Node {0} isn't ready, giving up".format(node.name))
-                    return
-                process_list.append(node)
-        if ready:
-            for node in process_list:
-                print("processing {0}".format(node.name))
-                node.process()
-        else:
-            print("not ready", node_list)
+   
     """
     if data_structure.DEBUG_MODE:
         do_update = do_update_debug

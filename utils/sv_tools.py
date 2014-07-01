@@ -319,9 +319,11 @@ def register():
     bpy.utils.register_class(SverchokHome)
     bpy.utils.register_class(SverchokToolsMenu)
     bpy.utils.register_class(ToolsNode)
+    bpy.utils.register_class(SvCallBackOp)
 
 
 def unregister():
+    bpy.utils.unregister_class(SvCallBackOp)
     bpy.utils.unregister_class(ToolsNode)
     bpy.utils.unregister_class(SverchokToolsMenu)
     bpy.utils.unregister_class(SverchokHome)
