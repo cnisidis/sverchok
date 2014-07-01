@@ -1,8 +1,10 @@
 
-nodes_dict = {'basic': ['debug_print'],
+nodes_dict = {'basic': ['debug_print',
+                        'group'],
                     
               'number': ['integer',
                          'range_int']
+            
               }
 
 

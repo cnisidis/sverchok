@@ -43,6 +43,28 @@ sv_script_paths, bl_addons_path, sv_version_local, sv_version = sv_get_local_pat
 sv_new_version = False
 
 
+class SvCallBackOp(bpy.types.Operator):
+    """ Load text data """
+    bl_idname = "node.sverchok_generic_callback"
+    bl_label = "Sverchok callback"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # from object in
+    fn_name = StringProperty()
+
+    def execute(self, context):
+        n = context.node
+        fn_name = self.fn_name
+
+        f = getattr(n, fn_name, None)
+        if not f:
+            msg = "{0} has no function named '{1}'".format(n.name, fn_name)
+            self.report({"WARNING"}, msg)
+            return {'CANCELLED'}
+        f()
+
+        return {'FINISHED'}
+
 class SverchokUpdateAll(bpy.types.Operator):
     """Sverchok update all"""
     bl_idname = "node.sverchok_update_all"

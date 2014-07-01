@@ -57,29 +57,6 @@ def new_output_socket(node, name, type):
         node.outputs.new('MatrixSocket', name, name)
 
 
-class SvTextInOp(bpy.types.Operator):
-    """ Load text data """
-    bl_idname = "node.sverchok_text_callback"
-    bl_label = "Sverchok text input"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    # from object in
-    fn_name = StringProperty(name='tree name')
-
-    def execute(self, context):
-        n = context.node
-        fn_name = self.fn_name
-
-        f = getattr(n, fn_name, None)
-        if not f:
-            msg = "{0} has no function named '{1}'".format(n.name, fn_name)
-            self.report({"WARNING"}, msg)
-            return {'CANCELLED'}
-        f()
-
-        return {'FINISHED'}
-
-
 # call structure
 # op load->load->load-mode->get_data
 # op reset-> reset. remove outputs, any data. as new
@@ -170,8 +147,8 @@ class SvTextInNode(bpy.types.Node, SverchCustomTreeNode):
         if self.current_text:
             layout.label(text="File: {0} loaded".format(self.current_text))
             #layout.prop(self,'reload_on_update','Reload every update')
-            layout.operator('node.sverchok_text_callback', text='Reload').fn_name = 'reload'
-            layout.operator('node.sverchok_text_callback', text='Reset').fn_name = 'reset'
+            layout.operator('node.sverchok_generic_callback', text='Reload').fn_name = 'reload'
+            layout.operator('node.sverchok_generic_callback', text='Reset').fn_name = 'reset'
         else:
             layout.prop(self, "text", "Select Text")
         #    layout.prop(self,"file","File") external file, TODO
@@ -197,7 +174,7 @@ class SvTextInNode(bpy.types.Node, SverchCustomTreeNode):
             if self.textmode == 'JSON':  # self documenting format
                 pass
 
-            layout.operator('node.sverchok_text_callback', text='Load').fn_name = 'load'
+            layout.operator('node.sverchok_generic_callback', text='Load').fn_name = 'load'
 
     def copy(self, node):
         self.n_id = ''
@@ -588,7 +565,7 @@ class SvTextOutNode(bpy.types.Node, SverchCustomTreeNode):
         if self.text_mode == 'JSON':
             layout.prop(self, 'json_mode', "Format", expand=True)
 
-        layout.operator('node.sverchok_text_callback', text='Dump').fn_name = 'dump'
+        layout.operator('node.sverchok_generic_callback', text='Dump').fn_name = 'dump'
         layout.prop(self, 'append', "Append")
         #layout.prop(self,'dump_on_update', "Dump on every update")
 

@@ -70,7 +70,7 @@ class WifiOutNode(bpy.types.Node, SverchCustomTreeNode):
         self.outputs.clear()
 
     def draw_buttons(self, context, layout):
-        op_name = 'node.sverchok_text_callback'
+        op_name = 'node.sverchok_generic_callback'
         if self.var_name:
             row = layout.row()
             row.label(text="Var:")

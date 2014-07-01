@@ -19,11 +19,11 @@
 import bpy
 from bpy.props import BoolProperty, BoolVectorProperty, StringProperty
 
-from node_tree import SverchCustomTreeNode
+from node_tree import SvInOutputNode
 from data_structure import multi_socket, SvGetSocketAnyType, updateNode
 
 
-class SvDebugPrintNode(SverchCustomTreeNode):
+class SvDebugPrintNode(SvInOutputNode):
     ''' SvDebugPrintNode '''
     bl_idname = 'SvDebugPrintNode'
     bl_label = 'Debug print'
@@ -43,7 +43,13 @@ class SvDebugPrintNode(SverchCustomTreeNode):
                               update=updateNode)
     state = StringProperty(default="NOT_READY", name = 'state')
 
-
+    
+    def disable(self):
+        pass
+    
+    def enable(self):
+        pass
+    
     def init(self, context):
         socket = self.inputs.new('StringsSocket', "Data 0")
 
