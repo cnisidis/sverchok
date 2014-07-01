@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import IntProperty
+from bpy.props import IntProperty, StringProperty
 from node_tree import SverchCustomTreeNode
 from data_structure import updateNode, SvSetSocketAnyType, SvGetSocketAnyType
 
@@ -32,13 +32,16 @@ class IntegerNode(SverchCustomTreeNode):
                        default=1,
                        options={'ANIMATABLE'}, update=updateNode)
 
+    state = StringProperty(default="NOT_READY", name = 'state')
+
     def init(self, context):
         self.inputs.new('StringsSocket', "Integer", "Integer").prop_name = 'int_'
         self.outputs.new('StringsSocket', "Integer", "Integer")
 
     def update(self):
         print("update called {0}".format(self.name))
-        self.state = len(self.outputs)
+        if len(self.outputs):
+            self.state = "ACTIVE"
         
     def process(self):
         number = self.inputs[0].sv_get()[0][0]

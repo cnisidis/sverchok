@@ -189,7 +189,12 @@ class SverchCustomTree(NodeTree):
             l = bpy.data.node_groups[self.id_data.name]
         except:
             return
-
+            
+        for node in self.nodes:
+            if node.state == "NOT_READY":
+                print("Giving up update, node {0} isn't ready".format(node.name))
+                return
+                
         build_update_list(tree=self)
         sverchok_update(tree=self)
 
@@ -207,8 +212,7 @@ class SverchCustomTreeNode( Node):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'SverchCustomTreeType'
-    state = IntProperty(default=0)
-
+    
 class SverchNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):

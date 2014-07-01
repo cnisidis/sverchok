@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import BoolProperty, BoolVectorProperty
+from bpy.props import BoolProperty, BoolVectorProperty, StringProperty
 
 from node_tree import SverchCustomTreeNode
 from data_structure import multi_socket, SvGetSocketAnyType, updateNode
@@ -41,6 +41,8 @@ class SvDebugPrintNode(SverchCustomTreeNode):
     print_data = BoolProperty(name='Active', description='Turn on/off printing to stdout',
                               default=True,
                               update=updateNode)
+    state = StringProperty(default="NOT_READY", name = 'state')
+
 
     def init(self, context):
         socket = self.inputs.new('StringsSocket', "Data 0")
@@ -55,11 +57,14 @@ class SvDebugPrintNode(SverchCustomTreeNode):
 
     def update(self):
         print("update called {0}".format(self.name))
+        if self.inputs[-1].links:
+            self.state = "NOT_READY"
         multi_socket(self, min=1)
-        if len(self.inputs)>1 and not self.inputs[-1].links:
-            self.state=any(self.print_socket) and self.print_data
-        else:
-            self.state=0
+        if any((s.links for s in self.inputs)):
+            if self.print_data:
+                self.state = "ACTIVE"
+            else:
+                self.state= "INACTIVE"
         
     def process(self):
         if not self.print_data:

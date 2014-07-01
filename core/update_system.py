@@ -325,19 +325,24 @@ def sverchok_update(start_node=None, tree=None, animation_mode=False):
     """
     global update_cache
     global partial_update_cache
-
+    
+    
     def do_update(node_list, nods):
         process_list = []
         ready = True
         for nod_name in node_list:
             if nod_name in nods:
                 node = nods[nod_name]
-                node.update()
-                if node.state:
+                #node.update()
+                if node.state == "ACTIVE":
                     print("Node {0} is ready".format(node.name))
-                else:
-                    print("Node {0} isn't ready".format(node.name))
-                ready *= node.state
+                    ready *=  True
+                elif node.state == "INACTIVE":
+                    ready *= False
+                    print("Node {0} inactive".format(node.name))
+                elif node.state == "NOT_READY":
+                    print("Node {0} isn't ready, giving up".format(node.name))
+                    return
                 process_list.append(node)
         if ready:
             for node in process_list:
@@ -385,6 +390,7 @@ def sverchok_update(start_node=None, tree=None, animation_mode=False):
     # update all node trees
     for name, ng in node_groups:
         if ng.bl_idname == 'SverchCustomTreeType':
+
             update_list = update_cache.get(name)
             if not update_list:
                 build_update_list(ng)

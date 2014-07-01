@@ -101,6 +101,7 @@ class GenListRangeInt(SverchCustomTreeNode):
         updateNode(self, context)
 
     mode = EnumProperty(items=modes, default='LAZYRANGE', update=mode_change)
+    state = StringProperty(default="NOT_READY", name = 'state')
 
     def init(self, context):
         self.inputs.new('StringsSocket', "Start").prop_name = 'start_'
@@ -118,7 +119,7 @@ class GenListRangeInt(SverchCustomTreeNode):
     def update(self):
         print("update called {0}".format(self.name))
         if self.outputs:
-            self.state = 1
+            self.state = "ACTIVE"
         
     def process(self):
         inputs = self.inputs
