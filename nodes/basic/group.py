@@ -47,7 +47,7 @@ class SvGroupNode(SverchCustomTreeNode):
         op_name = 'node.sverchok_generic_callback'
         if self.in_name:
             row = layout.row()
-            row.label(text="Var:")
+            row.label(text="Group:")
             row.label(text=self.in_name)
             op = layout.operator(op_name, text='Unlink')
             op.fn_name = "unlink"
@@ -57,6 +57,9 @@ class SvGroupNode(SverchCustomTreeNode):
             op.fn_name = "link"
 
     def find_output(self, node):
+        """
+        Find matching group output node
+        """
         if isinstance(node, SvGroupOutputsNode):
             return node
         for socket in node.outputs:
@@ -67,6 +70,12 @@ class SvGroupNode(SverchCustomTreeNode):
         return None
 
     def link(self):
+        """
+        Link group node by find input node and output node
+        and collect thier sockets and create an update list
+        for the node group that can be used by process
+        Needs lot of sanity checking
+        """
         n_id = node_id(self)
         self.state = "NOT_READY"
         group_name = self.group_names
@@ -115,8 +124,10 @@ class SvGroupNode(SverchCustomTreeNode):
             if socket.links:
                 data = socket.sv_get(deepcopy=False)
                 in_node.outputs[socket.name].sv_set(data)
+        # get update list
         ul = self.node_dict[n_id]
         do_update(ul[1:-1], self.id_data.nodes)
+        # set output sockets correctly
         for socket in self.outputs:
             if socket.links:
                 data = out_node.inputs[socket.name].sv_get(deepcopy=False)
@@ -134,6 +145,9 @@ class SvGroupInputsNode(SverchCustomTreeNode):
         self.outputs.new("StringsSocket","In 0")
         self.state = "INACTIVE"
 
+    # collect sockets and try to match type to keep inputs happy
+    # doesn't work 100% even in theory and untested.
+    
     def update(self):
         outputs = self.outputs
 
@@ -163,7 +177,7 @@ class SvGroupOutputsNode(SverchCustomTreeNode):
     bl_label = 'Group outputs'
     bl_icon = 'OUTLINER_OB_EMPTY'
 
-    state = StringProperty(default="ACTIVE", name='state')
+    state = StringProperty(default="INACTIVE", name='state')
     base_name = StringProperty(default='Data ')
     multi_socket_type = StringProperty(default='StringsSocket')
     
