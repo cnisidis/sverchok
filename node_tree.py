@@ -190,7 +190,7 @@ class SverchCustomTree(NodeTree):
         except:
             return
             
-        for node in self.nodes:
+        for node in reversed(self.nodes):
             print(node.name,node.state)
             if node.state == "NOT_READY":
                 print("Giving up update, node {0} isn't ready".format(node.name))

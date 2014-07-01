@@ -168,7 +168,6 @@ def register():
     text_editor_plugins.register()
     text_editor_submenu.register()
     handlers.register()
-
     bpy.utils.register_class(SverchokPreferences)
 
     if 'SVERCHOK' not in nodeitems_utils._node_categories:
