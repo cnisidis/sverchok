@@ -125,7 +125,7 @@ class SvGroupNode(SverchCustomTreeNode):
 
 class SvGroupInputsNode(SverchCustomTreeNode):
     bl_idname = 'SvGroupInputsNode'
-    bl_label = 'Group'
+    bl_label = 'Group Inputs'
     bl_icon = 'OUTLINER_OB_EMPTY'
 
     state = StringProperty(default="NOT_READY", name='state')
@@ -160,7 +160,7 @@ class SvGroupInputsNode(SverchCustomTreeNode):
 
 class SvGroupOutputsNode(SverchCustomTreeNode):
     bl_idname = 'SvGroupOutputsNode'
-    bl_label = 'Group'
+    bl_label = 'Group outputs'
     bl_icon = 'OUTLINER_OB_EMPTY'
 
     state = StringProperty(default="ACTIVE", name='state')
