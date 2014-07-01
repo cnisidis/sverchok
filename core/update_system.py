@@ -169,7 +169,31 @@ def separate_nodes(ng, links=None):
 
     return [node for node in node_set_list if len(node) > 1]
 
+def make_dep_tree(node_name, tree, dep_dict):
+    """
+    Create a update list for evaluating a node
+    """
+    ng = tree
+    nodes = ng.nodes
+    if not node_names:
+        print("No nodes!")
 
+    out_set = set([node_name])
+
+    out_stack = collections.deque(node_name)
+    current_node = out_stack.pop()
+    while current_node:
+        for node in node_links[current_node]:
+            if node not in out_set:
+                out_set.add(node)
+                out_stack.append(node)
+        if out_stack:
+            current_node = out_stack.pop()
+        else:
+            current_node = ''
+
+    return make_update_list(ng, out_set)
+    
 def make_tree_from_nodes(node_names, tree):
     """
     Create a partial update list from a sub-tree, node_names is a list of node that
