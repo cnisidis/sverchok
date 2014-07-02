@@ -90,9 +90,13 @@ class SvGroupNode(SverchCustomTreeNode):
             self.out_name = out_node.name
             for socket in in_node.outputs:
                 if socket.links:
+                    #t_s = socket.links[0].to_socket
+                    #self.inputs.new(t_s.bl_idname, t_s.name)
                     self.inputs.new(socket.bl_idname, socket.name)
             for socket in out_node.inputs:
                 if socket.links:
+                    #f_s = socket.links[0].from_socket
+                    #self.outputs.new(f_s.bl_idname, f_s.name)
                     self.outputs.new(socket.bl_idname, socket.name)
         update_list = make_tree_from_nodes([in_node.name], self.id_data)
         print(update_list)
@@ -182,7 +186,7 @@ class SvGroupOutputsNode(SverchCustomTreeNode):
     bl_icon = 'OUTLINER_OB_EMPTY'
 
     state = StringProperty(default="INACTIVE", name='state')
-    base_name = StringProperty(default='Data ')
+    base_name = StringProperty(default='Out ')
     multi_socket_type = StringProperty(default='StringsSocket')
     
     # just collect sockets
