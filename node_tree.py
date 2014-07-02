@@ -273,7 +273,7 @@ def make_categories():
             NodeItem("SvGroupNode", label="Group"),
             NodeItem("SvGroupInputsNode", label="Group In"),
             NodeItem("SvGroupOutputsNode", label="Group Out"),
-
+            NodeItem("SvIterNode", label="Iter"),
             ]),
         SverchNodeCategory("SVERCHOK_L", "SVERCHOK list", items=[
             ## lists nodes

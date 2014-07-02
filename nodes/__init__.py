@@ -1,6 +1,7 @@
 
 nodes_dict = {'basic': ['debug_print',
-                        'group'],
+                        'group',
+                        'iter'],
                     
               'number': ['integer',
                          'range_int',
