@@ -19,14 +19,14 @@
 from math import *
 
 import bpy
-from bpy. props import EnumProperty
+from bpy. props import EnumProperty, StringProperty
 
 from node_tree import SverchCustomTreeNode, StringsSocket
 from data_structure import (updateNode, match_long_repeat,
                             SvSetSocketAnyType, SvGetSocketAnyType)
 
 
-class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
+class ScalarMathNode(SverchCustomTreeNode):
     ''' ScalarMathNode '''
     bl_idname = 'ScalarMathNode'
     bl_label = 'function'
@@ -138,10 +138,15 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
         'PHI':      1.61803398875,
     }
 
+    def mode_change(self, context):
+        self.set_inputs()
+    
     items_ = EnumProperty(name="Function", description="Function choice",
                           default="SINE", items=mode_items,
-                          update=updateNode)
-
+                          update=mode_change)
+                          
+    state = StringProperty(default="NOT_READY", name = 'state')
+    
     def draw_buttons(self, context, layout):
         layout.prop(self, "items_", "Functions:")
 
@@ -152,18 +157,13 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
     def update(self):
 
         # inputs
-        nrInputs = 1
-        if self.items_ in self.constant:
-            nrInputs = 0
-        elif self.items_ in self.fx:
-            nrInputs = 1
-        elif self.items_ in self.fxy:
-            nrInputs = 2
+        self.set_inputs()
+        if all((s.links for s in self.inputs)):
+            self.state ="ACTIVE"
+        else:
+            self.state ="INACTIVE"
 
-        self.set_inputs(nrInputs)
-
-        self.label = self.items_
-
+    def process(self):
         if 'X' in self.inputs and self.inputs['X'].links and \
            type(self.inputs['X'].links[0].from_socket) == StringsSocket:
 
@@ -181,6 +181,7 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
         # outputs
         if 'float' in self.outputs and self.outputs['float'].links:
             result = []
+            nrInputs = len(self.inputs)
             if nrInputs == 0:
                 result = [[self.constant[self.items_]]]
             if nrInputs == 1:
@@ -194,7 +195,15 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
                     result = self.recurse_fxy(x, y, self.fxy[self.items_])
             SvSetSocketAnyType(self, 'float', result)
 
-    def set_inputs(self, n):
+    def set_inputs(self):
+        n = 1
+        if self.items_ in self.constant:
+            n = 0
+        elif self.items_ in self.fx:
+            n = 1
+        elif self.items_ in self.fxy:
+            n = 2
+
         if n == len(self.inputs):
             return
         if n < len(self.inputs):
@@ -205,6 +214,9 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
                 self.inputs.new('StringsSocket', "X", "x")
             if 'Y' not in self.inputs:
                 self.inputs.new('StringsSocket', "Y", "y")
+                
+        self.label = self.items_
+    
 
     # apply f to all values recursively
     def recurse_fx(self, l, f):
@@ -221,13 +233,13 @@ class ScalarMathNode(bpy.types.Node, SverchCustomTreeNode):
     # odd cases too.
     # [1,2,[1,1,1]] + [[1,2,3],1,2] -> [[2,3,4],3,[3,3,3]]
     def recurse_fxy(self, l1, l2, f):
-        if (isinstance(l1, (int, float)) and
-           isinstance(l2, (int, float))):
+        if isinstance(l1, (int, float)) and isinstance(l2, (int, float)):
                 return f(l1, l2)
-        if (isinstance(l2, (list, tuple)) and
-           isinstance(l1, (list, tuple))):
+        
+        if isinstance(l2, (list, tuple)) and isinstance(l1, (list, tuple)):
             data = zip(*match_long_repeat([l1, l2]))
             return [self.recurse_fxy(ll1, ll2, f) for ll1, ll2 in data]
+            
         if isinstance(l1, (list, tuple)) and isinstance(l2, (int, float)):
             return self.recurse_fxy(l1, [l2], f)
         if isinstance(l1, (int, float)) and isinstance(l2, (list, tuple)):

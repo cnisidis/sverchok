@@ -80,7 +80,7 @@ class SvGroupNode(SverchCustomTreeNode):
         self.state = "NOT_READY"
         group_name = self.group_names
         in_node = self.id_data.nodes.get(group_name)
-
+               
         if in_node:
             out_node = self.find_output(in_node)
             if not out_node:
@@ -108,6 +108,10 @@ class SvGroupNode(SverchCustomTreeNode):
         self.outputs.clear()
 
     def update(self):
+        n_id = node_id(self)
+        if self.in_name and not n_id in self.node_dict:
+            update_list = make_tree_from_nodes([self.in_name], self.id_data)
+            self.node_dict[n_id] = update_list
         if all((s.links for s in self.inputs)):
             if any((s.links for s in self.outputs)):
                 self.state = "ACTIVE"

@@ -220,6 +220,7 @@ class SverchGroupTree(NodeTree):
     @classmethod
     def poll(cls, context):
         return False
+    
   
 
 class SvInOutputNode(Node):
@@ -232,12 +233,20 @@ class SverchCustomTreeNode(Node):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname in ['SverchCustomTreeType','SverchGroupTreeType']
-
     
+    def update_node(self, context):
+        """
+        When a node has changed state and need to call a partial update.
+        For example a user exposed bpy.prop
+        """
+        sverchok_update(start_node=self)
+        
 class SverchNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
         return context.space_data.tree_type == 'SverchCustomTreeType'
+    
+    
 
 
 def make_categories():
@@ -266,7 +275,7 @@ def make_categories():
             NodeItem("SvGroupOutputsNode", label="Group Out"),
 
             ]),
-        #SverchNodeCategory("SVERCHOK_L", "SVERCHOK list", items=[
+        SverchNodeCategory("SVERCHOK_L", "SVERCHOK list", items=[
             ## lists nodes
             #NodeItem("ListLevelsNode", label="List Del Levels"),
             #NodeItem("ListJoinNode", label="List Join"),
@@ -279,7 +288,7 @@ def make_categories():
             #NodeItem("ListLengthNode", label="List Length"),
             #NodeItem("ListSumNode", label="List Sum"),
             #NodeItem("ListFLNode", label="List First&Last"),
-            #NodeItem("ListItem2Node", label="List Item"),
+            NodeItem("ListItem2Node", label="List Item"),
             #NodeItem("ListRepeaterNode", label="List Repeater"),
             #NodeItem("ListFuncNode", label="List Math"),
             #NodeItem("ListFlipNode", label="List Flip"),
@@ -289,7 +298,7 @@ def make_categories():
             #NodeItem("ListShuffleNode", label="List Shuffle"),
             #NodeItem("ListMatchNode", label="List Match"),
             #NodeItem("ConverterNode", label="SocketConvert"),
-            #]),
+            ]),
         SverchNodeCategory("SVERCHOK_N", "SVERCHOK number", items=[
             # numbers, formula nodes
             #NodeItem("GenSeriesNode", label="Series float"),
@@ -303,7 +312,7 @@ def make_categories():
             #NodeItem("Float2IntNode", label="Float 2 Int"),
             # NodeItem("FormulaNode", label="Formula"),
             #NodeItem("Formula2Node", label="Formula"),  # for newbies this is not predictable why "Formula2" renamed
-            #NodeItem("ScalarMathNode", label="Math"),
+            NodeItem("ScalarMathNode", label="Math"),
             #NodeItem("SvMapRangeNode", label="Map Range"),
             ]),
         #SverchNodeCategory("SVERCHOK_G", "SVERCHOK generator", items=[
@@ -321,9 +330,9 @@ def make_categories():
             #NodeItem("SvFormulaShapeNode", label="Formula shape"),
             #NodeItem("SvScriptNode", label="Scripted Node"),
             #]),
-        #SverchNodeCategory("SVERCHOK_V", "SVERCHOK vector", items=[
+        SverchNodeCategory("SVERCHOK_V", "SVERCHOK vector", items=[
             ## Vector nodes
-            #NodeItem("GenVectorsNode", label="Vector in"),
+            NodeItem("GenVectorsNode", label="Vector in"),
             #NodeItem("VectorsOutNode", label="Vector out"),
             #NodeItem("VectorMoveNode", label="Vector Move"),
             #NodeItem("VectorMathNode", label="Vector Math"),
@@ -333,7 +342,7 @@ def make_categories():
             #NodeItem("SvInterpolationNode", label="Vector Interpolation"),
             #NodeItem("SvVertSortNode", label="Vector Sort"),
             #NodeItem("SvNoiseNode", label="Vector Noise"),
-            #]),
+            ]),
         #SverchNodeCategory("SVERCHOK_Ma", "SVERCHOK matrix", items=[
             ## Matrix nodes
             #NodeItem("MatrixApplyNode", label="Matrix Apply"),

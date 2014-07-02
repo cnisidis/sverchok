@@ -3,8 +3,10 @@ nodes_dict = {'basic': ['debug_print',
                         'group'],
                     
               'number': ['integer',
-                         'range_int']
-            
+                         'range_int',
+                         'scalar'],
+             'list': ['item'],
+             'vector': ['vector_in']
               }
 
 

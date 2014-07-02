@@ -17,13 +17,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import FloatProperty
+from bpy.props import FloatProperty, StringProperty
 from node_tree import SverchCustomTreeNode, StringsSocket
 from data_structure import (updateNode, fullList,
                             SvSetSocketAnyType, SvGetSocketAnyType)
 
 
-class GenVectorsNode(bpy.types.Node, SverchCustomTreeNode):
+class GenVectorsNode(SverchCustomTreeNode):
     ''' Generator vectors '''
     bl_idname = 'GenVectorsNode'
     bl_label = 'Vectors in'
@@ -38,6 +38,8 @@ class GenVectorsNode(bpy.types.Node, SverchCustomTreeNode):
     z_ = FloatProperty(name='Z', description='Z',
                        default=0.0, precision=3,
                        update=updateNode)
+                       
+    state = StringProperty(default="NOT_READY", name = 'state')
 
     def init(self, context):
         self.inputs.new('StringsSocket', "X").prop_name = 'x_'
@@ -45,8 +47,9 @@ class GenVectorsNode(bpy.types.Node, SverchCustomTreeNode):
         self.inputs.new('StringsSocket', "Z").prop_name = 'z_'
         self.width = 100
         self.outputs.new('VerticesSocket', "Vectors", "Vectors")
+        self.state = "ACTIVE"
 
-    def update(self):
+    def process(self):
         # inputs
         if 'X' in self.inputs and self.inputs['X'].links and \
            type(self.inputs['X'].links[0].from_socket) == StringsSocket:

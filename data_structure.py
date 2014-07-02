@@ -750,67 +750,47 @@ def updateNode(self, context):
 ##############################################################
 ##############################################################
 
-# node has to have self veriables:
-# self.typ = bpy.props.StringProperty(name='typ', default='')
-# self.newsock = bpy.props.BoolProperty(name='newsock', default=False)
 # and in update:
 # inputsocketname = 'data' # 'data' - name of your input socket, that defines type
 # outputsocketname = ['dataTrue','dataFalse'] # 'data...' - are names of your sockets to be changed
 # changable_sockets(self, inputsocketname, outputsocketname)
 
 
-def check_sockets(self, inputsocketname):
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.VerticesSocket:
-        if self.typ == 'v':
-            self.newsock = False
-        else:
-            self.typ = 'v'
-            self.newsock = True
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.StringsSocket:
-        if self.typ == 's':
-            self.newsock = False
-        else:
-            self.typ = 's'
-            self.newsock = True
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.MatrixSocket:
-        if self.typ == 'm':
-            self.newsock = False
-        else:
-            self.typ = 'm'
-            self.newsock = True
-    return
-
-
-# cleaning of old not fited
-def clean_sockets(self, outputsocketname):
-    for n in outputsocketname:
-        if n in self.outputs:
-            self.outputs.remove(self.outputs[n])
-    return
-
 
 # main def for changable sockets type
-def changable_sockets(self, inputsocketname, outputsocketname):
-    if len(self.inputs[inputsocketname].links) > 0:
-        check_sockets(self, inputsocketname)
-        if self.newsock:
-            clean_sockets(self, outputsocketname)
-            self.newsock = False
-            if self.typ == 'v':
-                for n in outputsocketname:
-                    self.outputs.new('VerticesSocket', n, n)
-            if self.typ == 's':
-                for n in outputsocketname:
-                    self.outputs.new('StringsSocket', n, n)
-            if self.typ == 'm':
-                for n in outputsocketname:
-                    self.outputs.new('MatrixSocket', n, n)
-        else:
-            self.newsock = False
-    return
-
+def changable_sockets(node, inputsocketname, outputsocketname):
+    ng = node.id_data
+    old_state = node.state
+    if node.state == "NOT_READY":
+        return
+    node.state = "NOT_READY"
+    in_socket = node.inputs.get(inputsocketname)
+    if not in_socket:
+        print("Warning")
+        return
+    if in_socket.links:
+        stype =  in_socket.links[0].from_socket.bl_idname
+    out_links = []
+    for name in outputsocketname:
+        socket = node.outputs[name]
+        current_links = []
+        if socket.links:
+            for l in socket.links:
+                current_links.append(l.to_socket)
+        out_links.append(current_links)
+        
+        for i,name in enumerate(outputsocketname):
+            socket = node.outputs[name]
+            if socket.bl_idname != stype:
+                node.outputs.remove(socket)
+                f_s = node.outputs.new(stype, name)
+                print(i, out_links)
+                for t_s in out_links[i]:
+                    ng.links.new(f_s, t_s)
+    node.state = old_state
 
 def get_socket_type(node, inputsocketname):
+    print("Stupid function, stop using me")
     if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.VerticesSocket:
         return 'v'
     if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.StringsSocket:
@@ -822,13 +802,6 @@ def get_socket_type(node, inputsocketname):
 def get_socket_type_full(node, inputsocketname):
    # this is solution, universal and future proof.
     return node.inputs[inputsocketname].links[0].from_socket.bl_idname
-     # it is real solution, universal
-    #if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.VerticesSocket:
-    #    return 'VerticesSocket'
-    #if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.StringsSocket:
-    #    return 'StringsSocket'
-    #if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.MatrixSocket:
-    #    return 'MatrixSocket'
 
 
 ###########################################

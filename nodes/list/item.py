@@ -23,82 +23,6 @@ from data_structure import (changable_sockets, repeat_last, updateNode,
                             SvSetSocketAnyType, SvGetSocketAnyType)
 
 
-# supports of older code, remove soon
-# Linus Yng, Feb 4, 2014
-class ListItemNode(bpy.types.Node, SverchCustomTreeNode):
-    ''' List item '''
-    bl_idname = 'ListItemNode'
-    bl_label = 'List item old'
-    bl_icon = 'OUTLINER_OB_EMPTY'
-
-    level = IntProperty(name='level_to_count',
-                        default=2, min=0,
-                        update=updateNode)
-    item = IntProperty(name='item',
-                       default=0,
-                       update=updateNode)
-    typ = StringProperty(name='typ',
-                         default='')
-    newsock = BoolProperty(name='newsock',
-                           default=False)
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "level", text="level")
-        layout.prop(self, "item", text="item")
-
-    def init(self, context):
-        self.inputs.new('StringsSocket', "Data", "Data")
-        self.outputs.new('StringsSocket', "Item", "Item")
-        self.outputs.new('StringsSocket', "Other", "Other")
-
-    def update(self):
-        if 'Data' in self.inputs and len(self.inputs['Data'].links) > 0:
-            # адаптивный сокет
-            inputsocketname = 'Data'
-            outputsocketname = ['Item', 'Other']
-            changable_sockets(self, inputsocketname, outputsocketname)
-
-        if 'Item' in self.outputs and self.outputs['Item'].links or \
-                'Other' in self.outputs and self.outputs['Other'].links:
-
-            if 'Data' in self.inputs and self.inputs['Data'].links:
-                data = SvGetSocketAnyType(self, self.inputs['Data'])
-
-                if 'Item' in self.outputs and self.outputs['Item'].links:
-                    out = self.count(data, self.level-1, self.item, True)
-                    SvSetSocketAnyType(self, 'Item', out)
-                if 'Other' in self.outputs and self.outputs['Other'].links:
-                    out = self.count(data, self.level-1, self.item, False)
-                    SvSetSocketAnyType(self, 'Other', out)
-
-    def count(self, data, level, item, itself):
-        if level:
-            out = []
-            for obj in data:
-                out.append(self.count(obj, level-1, item, itself))
-
-        elif type(data) == tuple:
-            if item > len(data)-1:
-                item = len(data)-1
-            if itself:
-                out = [data[item]]
-            else:
-                out = [data[:item]+data[item+1:]]
-        elif type(data) == list:
-            if item > len(data)-1:
-                item = len(data)-1
-            if itself:
-                out = [data[item]]
-            else:
-                data.pop(item)
-                out = [data]
-        else:
-            out = None
-        return out
-
-    def update_socket(self, context):
-        self.update()
-
 # ListItem2
 # Allows a list of items, with both negative and positive index and repeated values
 # Other output is not wrapped.
@@ -107,7 +31,7 @@ class ListItemNode(bpy.types.Node, SverchCustomTreeNode):
 # by Linus Yng
 
 
-class ListItem2Node(bpy.types.Node, SverchCustomTreeNode):
+class ListItem2Node(SverchCustomTreeNode):
     ''' List item '''
     bl_idname = 'ListItem2Node'
     bl_label = 'List item'
@@ -123,6 +47,8 @@ class ListItem2Node(bpy.types.Node, SverchCustomTreeNode):
                          default='')
     newsock = BoolProperty(name='newsock',
                            default=False)
+                           
+    state = StringProperty(default="NOT_READY", name = 'state')
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "level", text="level")
@@ -132,36 +58,34 @@ class ListItem2Node(bpy.types.Node, SverchCustomTreeNode):
         self.inputs.new('StringsSocket', "Item", "Item").prop_name = 'item'
         self.outputs.new('StringsSocket', "Item", "Item")
         self.outputs.new('StringsSocket', "Other", "Other")
+        self.state = "ACTIVE"
 
     def update(self):
-        if 'Data' in self.inputs and len(self.inputs['Data'].links) > 0:
+        if self.inputs['Data'].links:
             inputsocketname = 'Data'
             outputsocketname = ['Item', 'Other']
             changable_sockets(self, inputsocketname, outputsocketname)
-
-        if 'Item' in self.outputs and self.outputs['Item'].links or \
-                'Other' in self.outputs and self.outputs['Other'].links:
-
-            if 'Data' in self.inputs and self.inputs['Data'].links:
-                data = SvGetSocketAnyType(self, self.inputs['Data'])
-
-                if 'Item' in self.inputs and self.inputs['Item'].links:
-                    items = SvGetSocketAnyType(self, self.inputs['Item'])
-                else:
-                    items = [[self.item]]
-
-                if 'Item' in self.outputs and self.outputs['Item'].links:
-                    if self.level-1:
-                        out = self.get(data, self.level-1, items, self.get_items)
-                    else:
-                        out = self.get_items(data, items[0])
-                    SvSetSocketAnyType(self, 'Item', out)
-                if 'Other' in self.outputs and self.outputs['Other'].links:
-                    if self.level-1:
-                        out = self.get(data, self.level-1, items, self.get_other)
-                    else:
-                        out = self.get_other(data, items[0])
-                    SvSetSocketAnyType(self, 'Other', out)
+        if any((s.links for s in self.outputs)):
+            self.state = 'ACTIVE'
+        else:
+            self.state = 'INACTIVE'
+            
+    def process(self):
+        
+        data = SvGetSocketAnyType(self, self.inputs['Data'])
+        items = self.inputs['Item'].sv_get()
+        if self.outputs['Item'].links:
+            if self.level-1:
+                out = self.get(data, self.level-1, items, self.get_items)
+            else:
+                out = self.get_items(data, items[0])
+            SvSetSocketAnyType(self, 'Item', out)
+        if self.outputs['Other'].links:
+            if self.level-1:
+                out = self.get(data, self.level-1, items, self.get_other)
+            else:
+                out = self.get_other(data, items[0])
+            SvSetSocketAnyType(self, 'Other', out)
 
     def get_items(self, data, items):
         if type(data) in [list, tuple]:
@@ -203,10 +127,8 @@ class ListItem2Node(bpy.types.Node, SverchCustomTreeNode):
 
 
 def register():
-    bpy.utils.register_class(ListItemNode)
     bpy.utils.register_class(ListItem2Node)
 
 
 def unregister():
-    bpy.utils.unregister_class(ListItemNode)
     bpy.utils.unregister_class(ListItem2Node)
