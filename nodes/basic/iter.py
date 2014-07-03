@@ -20,7 +20,7 @@ import bpy
 from bpy.props import StringProperty, EnumProperty, IntProperty
 
 from node_tree import SverchCustomTreeNode
-from data_structure import multi_socket, node_id
+from data_structure import multi_socket, node_id, updateNode
 from core.update_system import make_tree_from_nodes, do_update
 from .group import SvGroupInputsNode, SvGroupOutputsNode
 
@@ -41,7 +41,7 @@ class SvIterNode(SverchCustomTreeNode):
 
     group_names = EnumProperty(items=avail_groups, name="Groups")
     
-    count = IntProperty(default=10, min=1, name="Count")
+    count = IntProperty(default=10, min=1, name="Count", update=updateNode)
     
     in_name = StringProperty()
     out_name = StringProperty()

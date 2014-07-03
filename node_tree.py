@@ -386,16 +386,16 @@ def make_categories():
             #NodeItem("SvKDTreeNode", label="KDT Closest Verts"),
             #NodeItem("SvKDTreeEdgesNode", label="KDT Closest Edges"),  # KDTree renamed to be clear
             #]),
-        #SverchNodeCategory("SVERCHOK_X", "SVERCHOK beta nodes", items=[
+        SverchNodeCategory("SVERCHOK_X", "SVERCHOK beta nodes", items=[
             ## for testing convenience,
-            #NodeItem("BGLdemoNode", label="BGL debug print"),
+            NodeItem("BGLdemoNode", label="BGL debug print"),
             #NodeItem("BasicSplineNode", label="Basic Spline"),
             #NodeItem("SvOffsetNode", label="Offset"),
             #NodeItem("SvEmptyOutNode", label="Empty out"),
             ## NodeItem("Gen3DcursorNode", label="3D cursor"),
             #NodeItem("EvalKnievalNode", label="Eval Knieval"),
             #NodeItem("svBasicArcNode", label="Basic 3pt Arc"),
-            #]),
+            ]),
         ]
     return node_categories
 

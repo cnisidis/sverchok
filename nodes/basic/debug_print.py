@@ -42,7 +42,6 @@ class SvDebugPrintNode(SvInOutputNode):
                               default=True,
                               update=updateNode)
     state = StringProperty(default="NOT_READY", name = 'state')
-
     
     def disable(self):
         pass
