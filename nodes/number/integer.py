@@ -35,7 +35,7 @@ class IntegerNode(bpy.types.Node, SverchCustomTreeNode):
         if self.int_ > self.maxim:
             self.int_ = self.maxim
             return
-        updateNode(self, context)
+        self.update_node(context)
         
     def update_max(self, context):
         if self.maxim < self.minim:
@@ -64,7 +64,7 @@ class IntegerNode(bpy.types.Node, SverchCustomTreeNode):
                        default=True)
 
     def draw_label(self):
-        if not self.inputs[0].links:
+        if not self.inputs[0].is_linked:
             return str(self.int_)
         else:
             return self.bl_label
@@ -79,22 +79,11 @@ class IntegerNode(bpy.types.Node, SverchCustomTreeNode):
     def init(self, context):
         self.inputs.new('StringsSocket', "Integer", "Integer").prop_name = 'int_'
         self.outputs.new('StringsSocket', "Integer", "Integer")
+        self.set_state(ACTIVE)
 
-    def update(self):
-        # inputs
-        if 'Integer' in self.inputs and self.inputs['Integer'].links:
-            tmp = SvGetSocketAnyType(self, self.inputs['Integer'])
-            Integer = min(max(int(tmp[0][0]), self.minim), self.maxim)
-        else:
-            Integer = self.int_
-
-        # outputs
-        if 'Integer' in self.outputs and self.outputs['Integer'].links:
-            SvSetSocketAnyType(self, 'Integer', [[Integer]])
-
-    def update_socket(self, context):
-        self.update()
-
+    def process(self):
+        number = int(self.inputs[0].sv_get()[0][0])
+        self.outputs[0].sv_set([[number]])
 
 def register():
     bpy.utils.register_class(IntegerNode)

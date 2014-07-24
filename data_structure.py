@@ -717,23 +717,7 @@ def heat_map_state(state):
                     setattr(node, 'use_custom_color', use)
             ng.sv_user_colors = ""
             
-#####################################################
-############### update system magic! ################
-#####################################################
-
-
-def updateNode(self, context):
-    """
-    When a node has changed state and need to call a partial update.
-    For example a user exposed bpy.prop
-    """
-    global DEBUG_MODE
-    a = time.perf_counter()
-    sverchok_update(start_node=self)
-    b = time.perf_counter()
-    if DEBUG_MODE:
-        print("Partial update from node", self.name, "in", round(b-a, 4))            
-
+            
 ##############################################################
 ##############################################################
 ############## changable type of socket magic ################
