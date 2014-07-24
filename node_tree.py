@@ -18,7 +18,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import StringProperty, BoolProperty, FloatVectorProperty
+from bpy.props import (StringProperty, BoolProperty, FloatVectorProperty,
+                       IntProperty)
 from bpy.types import NodeTree, NodeSocket, NodeSocketStandard
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -69,26 +70,6 @@ class MatrixSocket(NodeSocket):
             return(.8,.3,.75,1.0)
         else: '''
         return(.2, .8, .8, 1.0)
-
-'''
-class ObjectSocket(NodeSocket):
-        'ObjectSocket'
-        bl_idname = "ObjectSocket"
-        bl_label = "Object Socket"
-
-        ObjectProperty = StringProperty(name= "ObjectProperty", update=updateSlot)
-
-        def draw(self, context, layout, node, text):
-            if self.is_linked:
-                layout.label(text)
-            else:
-                col = layout.column(align=True)
-                row = col.row(align=True)
-                row.prop(self, 'ObjectProperty', text=text)
-
-        def draw_color(self, context, node):
-            return(0.8,0.8,0.2,1.0)
-'''
 
 
 class VerticesSocket(NodeSocketStandard):
@@ -206,6 +187,28 @@ class SverchCustomTreeNode:
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'SverchCustomTreeType'
+  
+    # GENERAL IDEA
+    # of states < 0 are ready to be processed 
+    # nodes shouldn't have to bother about the state, just set it
+    # right
+    
+    NOT_READY = -1
+    INACTIVE = 0
+    ACTIVE = 1
+    
+    sv_state = IntProperty(default=NOT_READY)
+    
+    def set_state(self, state=INACTIVE):
+        self.sv_state = state
+    
+    def update_node(self, context):        
+        """
+        When a node has changed state and need to call a partial update.
+        Use only for user exposed bpy.props, never call it from inside
+        the process function
+        """
+        sverchok_update(start_node=self)
 
 
 class SverchNodeCategory(NodeCategory):
@@ -214,18 +217,11 @@ class SverchNodeCategory(NodeCategory):
         return context.space_data.tree_type == 'SverchCustomTreeType'
 
 
-#def Sverchok_nodes_count():
-#    cats = make_categories()
-#    count = []
-#    for cnt in cats:
-#        count.append(len(cnt.items))
-#    return count
 
 def register():
     bpy.utils.register_class(SvColors)
     bpy.utils.register_class(SverchCustomTree)
     bpy.utils.register_class(MatrixSocket)
-    #bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(StringsSocket)
     bpy.utils.register_class(VerticesSocket)
 
@@ -233,7 +229,6 @@ def register():
 def unregister():
     bpy.utils.unregister_class(VerticesSocket)
     bpy.utils.unregister_class(StringsSocket)
-    #bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(MatrixSocket)
     bpy.utils.unregister_class(SverchCustomTree)
     bpy.utils.unregister_class(SvColors)

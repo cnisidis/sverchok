@@ -743,72 +743,24 @@ def updateNode(self, context):
 ##############################################################
 
 # node has to have self veriables:
-# self.typ = bpy.props.StringProperty(name='typ', default='')
-# self.newsock = bpy.props.BoolProperty(name='newsock', default=False)
 # and in update:
 # inputsocketname = 'data' # 'data' - name of your input socket, that defines type
 # outputsocketname = ['dataTrue','dataFalse'] # 'data...' - are names of your sockets to be changed
 # changable_sockets(self, inputsocketname, outputsocketname)
 
-
-def check_sockets(self, inputsocketname):
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.VerticesSocket:
-        if self.typ == 'v':
-            self.newsock = False
-        else:
-            self.typ = 'v'
-            self.newsock = True
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.StringsSocket:
-        if self.typ == 's':
-            self.newsock = False
-        else:
-            self.typ = 's'
-            self.newsock = True
-    if type(self.inputs[inputsocketname].links[0].from_socket) == bpy.types.MatrixSocket:
-        if self.typ == 'm':
-            self.newsock = False
-        else:
-            self.typ = 'm'
-            self.newsock = True
-    return
-
-
-# cleaning of old not fited
-def clean_sockets(self, outputsocketname):
-    for n in outputsocketname:
-        if n in self.outputs:
-            self.outputs.remove(self.outputs[n])
-    return
-
-
-# main def for changable sockets type
 def changable_sockets(self, inputsocketname, outputsocketname):
+    '''
+    arguments: node, name of socket to follow, list of socket to change
+    '''
     if len(self.inputs[inputsocketname].links) > 0:
-        check_sockets(self, inputsocketname)
-        if self.newsock:
-            clean_sockets(self, outputsocketname)
-            self.newsock = False
-            if self.typ == 'v':
-                for n in outputsocketname:
-                    self.outputs.new('VerticesSocket', n, n)
-            if self.typ == 's':
-                for n in outputsocketname:
-                    self.outputs.new('StringsSocket', n, n)
-            if self.typ == 'm':
-                for n in outputsocketname:
-                    self.outputs.new('MatrixSocket', n, n)
-        else:
-            self.newsock = False
-    return
+        s_type = self.inputs[inputsocketname].links[0].from_socket.bl_idname
+        if self.outputs[outputsocketname[0]].bl_idname != s_type:
+            for n in outputsocketname:
+                if n in self.outputs:
+                    self.outputs.remove(self.outputs[n])
+            for n in outputsocketname:
+                self.outputs.new(s_type, n)
 
-
-def get_socket_type(node, inputsocketname):
-    if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.VerticesSocket:
-        return 'v'
-    if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.StringsSocket:
-        return 's'
-    if type(node.inputs[inputsocketname].links[0].from_socket) == bpy.types.MatrixSocket:
-        return 'm'
 
 
 def get_socket_type_full(node, inputsocketname):
