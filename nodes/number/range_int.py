@@ -20,7 +20,7 @@ import bpy
 from bpy.props import IntProperty, EnumProperty, StringProperty
 
 from node_tree import SverchCustomTreeNode
-from data_structure import updateNode, match_long_repeat
+from data_structure import match_long_repeat
 
 
 '''
@@ -64,21 +64,21 @@ class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
     start_ = IntProperty(
         name='start', description='start',
         default=0,
-        options={'ANIMATABLE'}, update=updateNode)
+        options={'ANIMATABLE'}, update=update_node)
 
     stop_ = IntProperty(
         name='stop', description='stop',
         default=10,
-        options={'ANIMATABLE'}, update=updateNode)
+        options={'ANIMATABLE'}, update=update_node)
     count_ = IntProperty(
         name='count', description='num items',
         default=10,
-        options={'ANIMATABLE'}, update=updateNode)
+        options={'ANIMATABLE'}, update=update_node)
 
     step_ = IntProperty(
         name='step', description='step',
         default=1,
-        options={'ANIMATABLE'}, update=updateNode)
+        options={'ANIMATABLE'}, update=update_node)
 
     current_mode = StringProperty(default="LAZYRANGE")
 
@@ -97,7 +97,7 @@ class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
         self.inputs[-1].prop_name = {'LAZYRANGE': 'stop_'}.get(mode, 'count_')
 
         self.current_mode = mode
-        updateNode(self, context)
+        self.update_node(context)
 
     mode = EnumProperty(items=modes, default='LAZYRANGE', update=mode_change)
 
@@ -107,6 +107,7 @@ class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
         self.inputs.new('StringsSocket', "Stop").prop_name = 'stop_'
 
         self.outputs.new('StringsSocket', "Range", "Range")
+        self.set_state(ACTIVE)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "mode", expand=True)
@@ -114,7 +115,7 @@ class GenListRangeInt(bpy.types.Node, SverchCustomTreeNode):
     func_dict = {'LAZYRANGE': intRange,
                  'COUNTRANGE': countRange}
 
-    def update(self):
+    def process(self):
         inputs = self.inputs
         outputs = self.outputs
 
