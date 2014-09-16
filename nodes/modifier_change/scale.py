@@ -54,19 +54,19 @@ class SvScaleNode(bpy.types.Node, SverchCustomTreeNode):
         return scaled
   
     def update(self):
+        # node not ready
+        if not self.outputs:
+            return
+        
         # inputs
-        if 'Vertices' in self.inputs and self.inputs['Vertices'].links:
+            
+        if self.inputs['Vertices'].links:
             Vertices = SvGetSocketAnyType(self, self.inputs['Vertices'])
-        else:
+        else: 
             Vertices = []
-        if 'Center' in self.inputs and self.inputs['Center'].links:
-            Center = SvGetSocketAnyType(self, self.inputs['Center'])[0]
-        else:
-            Center = [[0.0, 0.0, 0.0]]
-        if 'Factor' in self.inputs and self.inputs['Factor'].links:
-            Factor = SvGetSocketAnyType(self, self.inputs['Factor'])[0]
-        else:
-            Factor = [self.factor_]
+
+        Center = self.inputs["Center"].sv_get()[0]
+        Factor = self.inputs['Factor'].sv_get()[0]
 
         parameters = match_long_repeat([Vertices, Center, Factor])
 

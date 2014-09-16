@@ -105,7 +105,7 @@ class VerticesSocket(NodeSocketStandard):
             if out:
                 return out
         if self.prop_name:
-            return [[getattr(self.node, self.prop_name)]]
+            return [[getattr(self.node, self.prop_name)[:]]]
         return default
 
     def sv_set(self, data):
@@ -115,7 +115,7 @@ class VerticesSocket(NodeSocketStandard):
         if self.is_linked:
             layout.label(text + '. ' + SvGetSocketInfo(self))
         elif not self.is_output and self.prop_name:
-            layout.prop(node, self.prop_name, expand=False)
+            layout.prop(node, self.prop_name, expand=False, text="")
         else:
             layout.label(text)
 
@@ -130,7 +130,7 @@ class StringsSocket(NodeSocketStandard):
 
     prop_name = StringProperty(default='')
 
-    def sv_get(self, default=None, deepcopy=False):
+    def sv_get(self, default=None, deepcopy=True):
         if self.links and not self.is_output:
             out = SvGetSocket(self, deepcopy)
             if out:
