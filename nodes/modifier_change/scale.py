@@ -19,7 +19,7 @@
 from mathutils import Vector
 
 import bpy
-from bpy.props import FloatProperty
+from bpy.props import FloatProperty, FloatVectorProperty
 
 from node_tree import SverchCustomTreeNode
 from data_structure import SvGetSocketAnyType, SvSetSocketAnyType, updateNode, match_long_repeat
@@ -34,12 +34,13 @@ class SvScaleNode(bpy.types.Node, SverchCustomTreeNode):
     factor_ = FloatProperty(name='Factor', description='scaling factor',
                            default=1.0,
                            options={'ANIMATABLE'}, update=updateNode)
+    center_ = FloatVectorProperty(name="Center", default=(0,0,0), update=updateNode)
 
     def init(self, context):
-        self.inputs.new('VerticesSocket', "Vertices", "Vertices")
-        self.inputs.new('VerticesSocket', "Center", "Center")
-        self.inputs.new('StringsSocket', "Factor", "Factor").prop_name = "factor_"
-        self.outputs.new('VerticesSocket', "Vertices", "Vertices")
+        self.inputs.new('VerticesSocket', "Vertices")
+        self.inputs.new('VerticesSocket', "Center").prop_name = "center_"
+        self.inputs.new('StringsSocket', "Factor").prop_name = "factor_"
+        self.outputs.new('VerticesSocket', "Vertices")
 
     def scaling(self, vertex, center, factor):
         pt = Vector(vertex)

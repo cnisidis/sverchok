@@ -98,20 +98,24 @@ class VerticesSocket(NodeSocketStandard):
     prop_name = StringProperty(default='')
 
     # beta interface only use for debug, might change
+
     def sv_get(self, default=None, deepcopy=False):
         if self.links and not self.is_output:
-            return SvGetSocket(self, deepcopy)
-        else:
-            return default
+            out = SvGetSocket(self, deepcopy)
+            if out:
+                return out
+        if self.prop_name:
+            return [[getattr(self.node, self.prop_name)]]
+        return default
 
     def sv_set(self, data):
         SvSetSocket(self, data)
 
     def draw(self, context, layout, node, text):
-    #    if not self.is_output and not self.is_linked and self.prop_name:
-    #        layout.prop(node,self.prop_name,expand=False)
         if self.is_linked:
             layout.label(text + '. ' + SvGetSocketInfo(self))
+        elif not self.is_output and self.prop_name:
+            layout.prop(node, self.prop_name, expand=False)
         else:
             layout.label(text)
 
